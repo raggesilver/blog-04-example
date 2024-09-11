@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Students</title>
+  </head>
+  <body>
+    <h1>Students</h1>
+    <ul id="students">
+      <!-- Students will be added here -->
+    </ul>
+
+    <form id="form" action="http://localhost:3001/add-student" method="post">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="number" name="age" placeholder="Age" required />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Let's add some JavaScript to interact with our server -->
+    <script>
+      fetch("http://localhost:3001/students")
+        .then((response) => response.json())
+        .then((students) => {
+          const studentsList = document.getElementById("students");
+          for (const student of students) {
+            const li = document.createElement("li");
+            li.innerText = `${student.name} (${student.age})`;
+            studentsList.appendChild(li);
+          }
+        });
+    </script>
+
+    <script>
+      const form = document.querySelector("form");
+      form.addEventListener("submit", async (event) => {
+        // The following line prevents the default behavior of the form, thus
+        // preventing the page from navigating.
+        event.preventDefault();
+
+        // What comes next is our implementation to send the form data to the
+        // server.
+        const formData = new FormData(form);
+        const response = await fetch("http://localhost:3001/add-student", {
+          method: "POST",
+          body: new URLSearchParams(formData),
+          headers: {
+            "content-type": "application/x-www-form-urlencoded",
+          },
+        });
+        // const message = await response.text();
+        // alert(message);
+        const student = await response.json();
+        const list = document.getElementById("students");
+        const listItem = document.createElement("li");
+        listItem.innerText = `${student.name} (${student.age})`;
+        list.appendChild(listItem);
+
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
